@@ -36,6 +36,8 @@ This allows players to choose the level of challenge they want.
 - **Tailwind CSS** – Utility-first styling
 - **Git & GitHub** – Version control
 
+---
+
 ## 👤 Author
 
 **Gema** 
