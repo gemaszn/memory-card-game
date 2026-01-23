@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { cards } from "../data/cards";
-import type { Difficulty } from "../types/game";
+import type { Difficulty, Card as CardType } from "../types/game";
 import { Card } from "./Card";
 
 interface Props {
@@ -26,10 +27,20 @@ export const Board = ({ difficulty }: Props) => {
                 : "grid-cols-4";
 
 
+    const [boardCards, setBoardCards] = useState<CardType[]>(cardsForBoard);
+
+    const handleFlipCard = (clickedCard: CardType) => {
+        setBoardCards(prevCards =>
+            prevCards.map(card =>
+                card.id === clickedCard.id ? { ...card, isUp: !card.isUp } : card
+            )
+        );
+    };
+
     return (
         <div className={`grid ${gridCols} gap-4`}>
-            {cardsForBoard.map(card => (
-                <Card key={card.id} card={card} />
+            {boardCards.map(card => (
+                <Card key={card.id} card={card} onClick={() => handleFlipCard(card)} />
             ))}
         </div>
     )
