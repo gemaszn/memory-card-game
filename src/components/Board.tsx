@@ -11,6 +11,7 @@ export const Board = ({ difficulty }: Props) => {
 
     let cardsForBoard;
 
+    // Determine the number of cards based on difficulty
     if (difficulty === "easy") {
         cardsForBoard = cards.slice(0, 12);
     } else if (difficulty === "medium") {
@@ -27,14 +28,58 @@ export const Board = ({ difficulty }: Props) => {
                 : "grid-cols-4";
 
 
+    // State to manage the cards on the board
     const [boardCards, setBoardCards] = useState<CardType[]>(cardsForBoard);
 
+    // Function to handle card flip
     const handleFlipCard = (clickedCard: CardType) => {
-        setBoardCards(prevCards =>
-            prevCards.map(card =>
-                card.id === clickedCard.id ? { ...card, isUp: !card.isUp } : card
-            )
-        );
+
+        // Allow flipping only if less than 2 non-matched cards are face up
+        setBoardCards(prevCards => {
+
+            const faceUpUnmatchedCards = prevCards.filter(
+                card => card.isUp && !card.isMatched
+            );
+
+            if (faceUpUnmatchedCards.length >= 2 || clickedCard.isMatched) {
+                return prevCards;
+            }
+
+            return prevCards.map(card =>
+                card.id === clickedCard.id
+                    ? { ...card, isUp: !card.isUp }
+                    : card
+            );
+        });
+
+        //Check for matches after a short delay
+        setTimeout(() => {
+            setBoardCards(prevCards => {
+                const faceUpUnmatchedCards = prevCards.filter(
+                    card => card.isUp && !card.isMatched
+                );
+
+
+                if (faceUpUnmatchedCards.length === 2) {
+                    if (faceUpUnmatchedCards[0].pattern === faceUpUnmatchedCards[1].pattern) {
+                        // Match => mark them as matched
+                        return prevCards.map(card =>
+                            card.isUp && !card.isMatched
+                                ? { ...card, isMatched: true }
+                                : card
+                        );
+                    } else {
+                        // No match => flip them back down
+                        return prevCards.map(card =>
+                            card.isUp && !card.isMatched
+                                ? { ...card, isUp: false }
+                                : card
+                        );
+                    }
+                }
+                return prevCards;
+            });
+        }, 2000);
     };
 
     return (
